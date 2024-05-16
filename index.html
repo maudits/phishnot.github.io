@@ -62,13 +62,17 @@
   <script>
     $(document).ready(function(){
       $('#checkButton').click(function(){
-        var inputUrl = new URL($('#urlInput').val()).hostname;
+        var inputUrl = $('#urlInput').val();
+        if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
+          inputUrl = 'https://' + inputUrl; // prepend https:// if not provided
+        }
+        var inputHostname = new URL(inputUrl).hostname;
         $.get('phish.db', function(data){
           var lines = data.split('\n');
           var isPhish = false;
           for(var i = 0; i < lines.length; i++){
             var urlInList = new URL(lines[i].trim()).hostname;
-            if(urlInList === inputUrl){
+            if(urlInList === inputHostname){
               isPhish = true;
               break;
             }
