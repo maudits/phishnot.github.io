@@ -73,6 +73,9 @@
           var lines = data.split('\n');
           var isPhish = false;
           for(var i = 0; i < lines.length; i++){
+            if (!isValidUrl(lines[i].trim())) {
+              continue; // Skip invalid URLs
+            }
             var urlInList = new URL(lines[i].trim()).hostname;
             if(urlInList === inputHostname){
               isPhish = true;
@@ -92,6 +95,14 @@
         });
       });
     });
+    function isValidUrl(url) {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
   </script>
 </body>
 </html>
