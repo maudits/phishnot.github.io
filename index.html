@@ -62,12 +62,13 @@
   <script>
     $(document).ready(function(){
       $('#checkButton').click(function(){
-        var inputUrl = $('#urlInput').val();
+        var inputUrl = new URL($('#urlInput').val()).hostname;
         $.get('phish.db', function(data){
           var lines = data.split('\n');
           var isPhish = false;
           for(var i = 0; i < lines.length; i++){
-            if(lines[i].trim() === inputUrl){
+            var urlInList = new URL(lines[i].trim()).hostname;
+            if(urlInList === inputUrl){
               isPhish = true;
               break;
             }
