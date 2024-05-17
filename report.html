@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>phishNot - Validate Phishing URLs</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-color: #f4f4f4;
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .icon {
+      width: 5rem;
+    }
+    .h1, h1{
+      font-size: 5rem;
+    }
+    .icon-svg{
+      width: 5rem;
+      height: 5rem;
+    }
+    .icon-red{
+      fill:red;
+    }
+    .icon-green{
+      fill:green;
+    }
+    input, button{
+      user-select: none !important;
+    }
+    input:focus,
+    button:focus {
+      outline: none;
+    }
+    footer {
+      border-top: 1px solid #ccc;
+      background-color: #f9f9f9;
+      padding: 10px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1>phishNot</h1>
+    <h2>Report a <em>phish</em></h2>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="urlInput" value="https://">
+          <div class="input-group-append">
+            <button class="btn btn-primary" id="checkButton">Submit </button>
+          </div>
+        </div>
+        <div id="result" class="text-center mt-3"></div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <small>2024 © phishnot.com | <a href="report.html" id="report">report</a> | <a href="about.html" id="about">about</a> | <a href="mailto:info@phishnot.com" id="contact">contact</a></small> 
+  </footer>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('#checkButton').click(function(){
+
+        var inputUrl = $('#urlInput').val();
+        if (!isValidUrl(inputUrl)) {
+          $('#result').html("Invalid URL");
+          return;
+        }
+        var $button = $(this);
+        $button.addClass('disabled').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...');
+
+        if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
+          inputUrl = 'https://' + inputUrl; // prepend https:// if not provided
+        }
+        let p=btoa(inputUrl)
+        var inputHostname = new URL(inputUrl).hostname;
+        $.get(`/?phish=${p}`, function(data){
+          $('#result').html("Thank you for submitting this report.")
+          $button.removeClass('disabled').html('Check');
+        });
+      });
+    });
+    function isValidUrl(url) {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3070154119516961"
+  crossorigin="anonymous"></script>
+</body>
+</html>
