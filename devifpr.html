@@ -101,6 +101,54 @@
     }
     
     appendLine(getBrowserSystemInfo());
+
+    function getLocalIPs(callback) {
+        const ips = [];
+        const pc = new RTCPeerConnection({
+            iceServers: []
+        });
+
+        pc.createDataChannel("");
+        pc.createOffer().then(offer => pc.setLocalDescription(offer));
+        pc.onicecandidate = event => {
+            if (!event || !event.candidate) {
+                // All ICE candidates have been sent
+                callback(ips);
+                return;
+            }
+            const parts = event.candidate.candidate.split(" ");
+            const ip = parts[4];
+            if (!ips.includes(ip)) {
+                ips.push(ip);
+            }
+        };
+    }
+
+    getLocalIPs(ips => {
+        appendLine("Local IPs: "+ ips);
+    });
+    function getScreenAndHardwareData() {
+        const screenResolution = `${screen.width}x${screen.height}`;
+        const colorDepth = screen.colorDepth;
+        const hardwareConcurrency = navigator.hardwareConcurrency;
+
+        appendLine("Screen Resolution: "+ screenResolution);
+        appendLine("Color Depth: "+ colorDepth);
+        appendLine("Hardware Concurrency: "+ hardwareConcurrency);
+    }
+
+    getScreenAndHardwareData();
+    function getBrowserData() {
+        const userAgent = navigator.userAgent;
+        const plugins = Array.from(navigator.plugins).map(p => p.name).join(", ");
+        const mimeTypes = Array.from(navigator.mimeTypes).map(m => m.type).join(", ");
+
+        appendLine("User Agent: "+ userAgent);
+        appendLine("Plugins: "+ plugins);
+        appendLine("Mime Types: "+ mimeTypes);
+    }
+
+    getBrowserData();
         </script>
     </body>
 </html> 
