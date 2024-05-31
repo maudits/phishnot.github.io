@@ -8,7 +8,7 @@
         <script>
         var paragraph = document.getElementById('par');
         function appendLine(line){
-            paragraph.innerHTML += `<br/>${line}`;
+            paragraph.innerHTML += `<br/>${JSON.stringify(line)}`;
         }
             function getCanvasFingerprint() {
         var canvas = document.createElement('canvas');
