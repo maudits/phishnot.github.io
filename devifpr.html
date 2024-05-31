@@ -1,0 +1,106 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <code id="par"></code>
+
+        <script>
+        var paragraph = document.getElementById('par');
+        function appendLine(line){
+            paragraph.innerHTML += `<br/>${line}`;
+        }
+            function getCanvasFingerprint() {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '16px Arial';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Hello, world!', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Hello, world!', 4, 17);
+        return canvas.toDataURL();
+    }
+    appendLine(getCanvasFingerprint());
+    
+    function getWebGLFingerprint() {
+        var canvas = document.createElement('canvas');
+        var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return null;
+    
+        var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        var vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+        var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+    
+        return {
+            vendor: vendor,
+            renderer: renderer
+        };
+    }
+    appendLine(getWebGLFingerprint());
+    
+    function getFontFingerprint() {
+        var fonts = ["Arial", "Courier New", "Times New Roman", "Comic Sans MS"];
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var widths = {};
+    
+        fonts.forEach(function(font) {
+            ctx.font = '72px ' + font;
+            widths[font] = ctx.measureText('a').width;
+        });
+    
+        return widths;
+    }
+    appendLine(getFontFingerprint());
+    
+    function getAudioFingerprint() {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var oscillator = audioCtx.createOscillator();
+        var analyser = audioCtx.createAnalyser();
+        var gainNode = audioCtx.createGain();
+        var scriptProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
+    
+        var fingerprint = [];
+    
+        scriptProcessor.onaudioprocess = function(event) {
+            var bins = new Float32Array(analyser.frequencyBinCount);
+            analyser.getFloatFrequencyData(bins);
+            fingerprint.push(bins[0]);
+        };
+    
+        oscillator.type = 'triangle';
+        oscillator.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(scriptProcessor);
+        scriptProcessor.connect(audioCtx.destination);
+    
+        oscillator.start(0);
+        setTimeout(function() {
+            oscillator.stop();
+            scriptProcessor.disconnect();
+            audioCtx.close();
+            appendLine(fingerprint);
+        }, 500);
+    }
+    
+    getAudioFingerprint();
+    
+    function getBrowserSystemInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            platform: navigator.platform,
+            screenResolution: [screen.width, screen.height],
+            colorDepth: screen.colorDepth,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        };
+    }
+    
+    appendLine(getBrowserSystemInfo());
+        </script>
+    </body>
+</html> 
